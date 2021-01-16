@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ImagePng
 {
-    struct ColorRGB
+    public struct ColorRGB
     {
         public byte R;
         public byte G;
@@ -89,7 +89,7 @@ namespace ImagePng
         }
     }
 
-    class ImagePng
+    public class ImagePng
     {
         public int Width { get; set; }
         public int Height { get; set; }
