@@ -7,17 +7,19 @@ using System.Linq;
 
 namespace ImagePng
 {
-    public struct ColorRGB
+    public struct ColorRGBA
     {
         public byte R;
         public byte G;
         public byte B;
+        public byte A;
 
-        public ColorRGB(byte r, byte g, byte b)
+        public ColorRGBA(byte r, byte g, byte b, byte a)
         {
             this.R = r;
             this.G = g;
             this.B = b;
+            this.A = a;
         }
     }
     struct Chunk
@@ -100,11 +102,11 @@ namespace ImagePng
         public int FilterMethod { get; set; }
         public int InterlaceMethod { get; set; }
 
-        List<ColorRGB> pixelsRGB;
+        List<ColorRGBA> pixelsRGBA;
 
         public ImagePng(string fileName)
         {
-            pixelsRGB = new List<ColorRGB>();
+            pixelsRGBA = new List<ColorRGBA>();
             Load(fileName);
         }
 
@@ -142,8 +144,6 @@ namespace ImagePng
                 {
                     ReadIEND(chunk);
                 }
-
-                //Console.WriteLine("[{0}]", chunk.GetChunkType());
             }
 
             reader.Close();
@@ -181,8 +181,8 @@ namespace ImagePng
 
         private void ReadIHDR(Chunk chunk)
         {
-            MemoryStream stream = new MemoryStream(chunk.ChunkData);
-            BinaryReader reader = new BinaryReader(stream);
+            using MemoryStream stream = new MemoryStream(chunk.ChunkData);
+            using BinaryReader reader = new BinaryReader(stream);
 
             byte[] bytesWidth = reader.ReadBytes(4);
             this.Width = (int)BitConverter.ToUInt32(bytesWidth.Reverse().ToArray());
@@ -195,15 +195,12 @@ namespace ImagePng
             this.CompressionType = (int)reader.ReadByte();
             this.FilterMethod = (int)reader.ReadByte();
             this.InterlaceMethod = (int)reader.ReadByte();
-
-
-            reader.Close();
-            stream.Close();
         }
 
         private void ReadPLTE(Chunk chunk)
         {
-            Console.WriteLine("PLTE");
+            // TODO: Read PLTE chunk
+            // Console.WriteLine("PLTE");
         }
 
         private void ReadIDAT(Chunk chunk)
@@ -214,21 +211,16 @@ namespace ImagePng
             data = data.Skip(2).ToArray();
 
             byte[] decompressed = null;
-            using (MemoryStream stream = new MemoryStream(data))
-            {
-                stream.Position = 0;
-                var decompress = new DeflateStream(stream, CompressionMode.Decompress);
+            using MemoryStream stream = new MemoryStream(data);
+            stream.Position = 0;
 
-                MemoryStream reader = new MemoryStream();
-                decompress.CopyTo(reader);
-
-                decompressed = reader.ToArray();
-
-                decompress.Close();
-                reader.Close();
-            }
+            using DeflateStream decompress = new DeflateStream(stream, CompressionMode.Decompress);
+            using MemoryStream reader = new MemoryStream();
+            decompress.CopyTo(reader);
+            decompressed = reader.ToArray();
+            
       
-            BinaryReader pixels = new BinaryReader(new MemoryStream(decompressed));
+            using BinaryReader pixels = new BinaryReader(new MemoryStream(decompressed));
 
             if (BitDepth == 8 && ColorType == 6 && CompressionType == 0)
             {
@@ -243,7 +235,7 @@ namespace ImagePng
                     }
                     else if (filterType == 1) // sub
                     {
-                        ColorRGB previousColor = new ColorRGB(0, 0, 0);
+                        ColorRGBA previousColor = new ColorRGBA(0, 0, 0, 0);
 
                         for (int x = 0; x < Width; x++)
                         {
@@ -252,8 +244,8 @@ namespace ImagePng
                             byte B = pixels.ReadByte();
                             byte A = pixels.ReadByte();
 
-                            ColorRGB color = new ColorRGB((byte)(previousColor.R + R), (byte)(previousColor.G + G), (byte)(previousColor.B + B));
-                            pixelsRGB.Add(color);
+                            ColorRGBA color = new ColorRGBA((byte)(previousColor.R + R), (byte)(previousColor.G + G), (byte)(previousColor.B + B), (byte)(previousColor.A + A));
+                            pixelsRGBA.Add(color);
 
                             previousColor = color;
                         }
@@ -272,18 +264,16 @@ namespace ImagePng
                     }
                 }
             }
-
-            pixels.Close();
         }
 
         private void ReadIEND(Chunk chunk)
         {
-            Console.WriteLine("IEND");
+
         }
 
-        public ColorRGB GetPixel(int x, int y)
+        public ColorRGBA GetPixel(int x, int y)
         {
-            return pixelsRGB[y * Width + x];
+            return pixelsRGBA[y * Width + x];
         }
     }
 }
