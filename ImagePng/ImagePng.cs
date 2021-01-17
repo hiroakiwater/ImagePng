@@ -237,7 +237,16 @@ namespace ImagePng
 
                     if (filterType == 0) // none
                     {
-                        // TODO: Filter type none
+                        for (int x = 0; x < Width; x++)
+                        {
+                            byte R = pixels.ReadByte();
+                            byte G = pixels.ReadByte();
+                            byte B = pixels.ReadByte();
+                            byte A = pixels.ReadByte();
+
+                            ColorRGBA color = new ColorRGBA(R, G, B, A);
+                            pixelsRGBA.Add(color);
+                        }
                     }
                     else if (filterType == 1) // sub
                     {
