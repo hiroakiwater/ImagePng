@@ -219,7 +219,6 @@ namespace ImagePng
             // Skip gzip header (2 bytes)
             data = data.Skip(2).ToArray();
 
-            byte[] decompressed = null;
             using MemoryStream stream = new MemoryStream(data);
             stream.Position = 0;
 
