@@ -102,12 +102,21 @@ namespace ImagePng
         public int FilterMethod { get; set; }
         public int InterlaceMethod { get; set; }
 
-        List<ColorRGBA> pixelsRGBA;
+        List<ColorRGBA> pixelsRGBA = new List<ColorRGBA>();
+
+        public ImagePng()
+        {
+
+        }
 
         public ImagePng(string fileName)
         {
-            pixelsRGBA = new List<ColorRGBA>();
             Load(fileName);
+        }
+
+        public ImagePng(Stream stream)
+        {
+            Load(stream);
         }
 
         public bool Load(string fileName)
