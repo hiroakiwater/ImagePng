@@ -228,7 +228,12 @@ namespace ImagePng
             dataStream.Position = 0;
             using BinaryReader pixels = new BinaryReader(dataStream);
 
-            if (BitDepth == 8 && ColorType == 6 && CompressionType == 0)
+            byte R = 0;
+            byte G = 0;
+            byte B = 0;
+            byte A = 0;
+
+            if (BitDepth == 8 && (ColorType == 6 || ColorType == 2) && CompressionType == 0)
             {
                 for (int y = 0; y < Height; y++)
                 {
@@ -239,10 +244,18 @@ namespace ImagePng
                     {
                         for (int x = 0; x < Width; x++)
                         {
-                            byte R = pixels.ReadByte();
-                            byte G = pixels.ReadByte();
-                            byte B = pixels.ReadByte();
-                            byte A = pixels.ReadByte();
+                            R = pixels.ReadByte();
+                            G = pixels.ReadByte();
+                            B = pixels.ReadByte();
+
+                            if (ColorType == 6)
+                            {
+                                A = pixels.ReadByte();
+                            }
+                            else
+                            {
+                                A = 255;
+                            }
 
                             ColorRGBA color = new ColorRGBA(R, G, B, A);
                             pixelsRGBA.Add(color);
@@ -254,10 +267,18 @@ namespace ImagePng
 
                         for (int x = 0; x < Width; x++)
                         {
-                            byte R = pixels.ReadByte();
-                            byte G = pixels.ReadByte();
-                            byte B = pixels.ReadByte();
-                            byte A = pixels.ReadByte();
+                            R = pixels.ReadByte();
+                            G = pixels.ReadByte();
+                            B = pixels.ReadByte();
+
+                            if (ColorType == 6)
+                            {
+                                A = pixels.ReadByte();
+                            } else
+                            {
+                                A = 0;
+                                previousColor.A = 255;
+                            }
 
                             ColorRGBA color = new ColorRGBA((byte)(previousColor.R + R), (byte)(previousColor.G + G), (byte)(previousColor.B + B), (byte)(previousColor.A + A));
                             pixelsRGBA.Add(color);
