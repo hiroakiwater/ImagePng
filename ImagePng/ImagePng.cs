@@ -214,10 +214,8 @@ namespace ImagePng
 
         private void ReadIDAT(Chunk chunk)
         {
-            byte[] data = chunk.ChunkData.Take(chunk.ChunkData.Length).ToArray();
-
-            // Skip gzip header (2 bytes)
-            data = data.Skip(2).ToArray();
+            // Skip gzip header (2bytes)
+            byte[] data = chunk.ChunkData.Skip(2).ToArray();
 
             using MemoryStream stream = new MemoryStream(data);
             stream.Position = 0;
