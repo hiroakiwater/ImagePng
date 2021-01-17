@@ -110,7 +110,14 @@ namespace ImagePng
 
         public bool Load(string fileName)
         {
-            BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open));
+            Load(File.Open(fileName, FileMode.Open));
+
+            return true;
+        }
+
+        public bool Load(Stream stream)
+        {
+            BinaryReader reader = new BinaryReader(stream);
 
             if (ReadPngSignature(reader) == false)
             {
