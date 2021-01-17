@@ -223,13 +223,11 @@ namespace ImagePng
             using MemoryStream stream = new MemoryStream(data);
             stream.Position = 0;
 
-            using DeflateStream decompress = new DeflateStream(stream, CompressionMode.Decompress);
-            using MemoryStream reader = new MemoryStream();
-            decompress.CopyTo(reader);
-            decompressed = reader.ToArray();
-            
-      
-            using BinaryReader pixels = new BinaryReader(new MemoryStream(decompressed));
+            using DeflateStream decompressStream = new DeflateStream(stream, CompressionMode.Decompress);
+            using MemoryStream dataStream = new MemoryStream();
+            decompressStream.CopyTo(dataStream);
+            dataStream.Position = 0;
+            using BinaryReader pixels = new BinaryReader(dataStream);
 
             if (BitDepth == 8 && ColorType == 6 && CompressionType == 0)
             {
