@@ -44,7 +44,7 @@ namespace ImagePng
         {
             get
             {
-                if (Encoding.ASCII.GetString(ChunkType) == "IHDR")
+                if (GetChunkType() == "IHDR")
                 {
                     return true;
                 }
@@ -56,7 +56,7 @@ namespace ImagePng
         {
             get
             {
-                if (Encoding.ASCII.GetString(ChunkType) == "PLTE")
+                if (GetChunkType() == "PLTE")
                 {
                     return true;
                 }
@@ -68,7 +68,7 @@ namespace ImagePng
         {
             get
             {
-                if (Encoding.ASCII.GetString(ChunkType) == "IDAT")
+                if (GetChunkType() == "IDAT")
                 {
                     return true;
                 }
@@ -80,7 +80,7 @@ namespace ImagePng
         {
             get
             {
-                if (Encoding.ASCII.GetString(ChunkType) == "IEND" )
+                if (GetChunkType() == "IEND" )
                 {
                     return true;
                 }
