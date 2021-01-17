@@ -202,6 +202,8 @@ namespace ImagePng
         private void ReadIDAT(Chunk chunk)
         {
             byte[] data = chunk.ChunkData.Take(chunk.ChunkData.Length).ToArray();
+
+            // Skip gzip header (2 bytes)
             data = data.Skip(2).ToArray();
 
             byte[] decompressed = null;
@@ -225,20 +227,41 @@ namespace ImagePng
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    byte line = pixels.ReadByte();
-                    ColorRGB previousColor = new ColorRGB(0, 0, 0);
+                    // filter type: 0 to
+                    byte filterType = pixels.ReadByte();
 
-                    for (int x = 0; x < Width; x++)
+                    if (filterType == 0) // none
                     {
-                        byte R = pixels.ReadByte();
-                        byte G = pixels.ReadByte();
-                        byte B = pixels.ReadByte();
-                        byte A = pixels.ReadByte();
+                        // TODO: Filter type none
+                    }
+                    else if (filterType == 1) // sub
+                    {
+                        ColorRGB previousColor = new ColorRGB(0, 0, 0);
 
-                        ColorRGB color = new ColorRGB((byte)(previousColor.R + R), (byte)(previousColor.G +  G), (byte)(previousColor.B + B));
-                        pixelsRGB.Add(color);
+                        for (int x = 0; x < Width; x++)
+                        {
+                            byte R = pixels.ReadByte();
+                            byte G = pixels.ReadByte();
+                            byte B = pixels.ReadByte();
+                            byte A = pixels.ReadByte();
 
-                        previousColor = color;
+                            ColorRGB color = new ColorRGB((byte)(previousColor.R + R), (byte)(previousColor.G + G), (byte)(previousColor.B + B));
+                            pixelsRGB.Add(color);
+
+                            previousColor = color;
+                        }
+                    }
+                    else if (filterType == 2) // up
+                    {
+                        // TODO: Filter type up
+                    }
+                    else if (filterType == 3) // average
+                    {
+                        // TODO: Filter type average
+                    }
+                    else if (filterType == 4) // paeth
+                    {
+                        // TODO: Filter type peath
                     }
                 }
             }
